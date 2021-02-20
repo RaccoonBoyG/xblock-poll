@@ -357,7 +357,8 @@ class PollBase(XBlock, ResourceMixin, PublishEventMixin):
                     )
                 )
             if image:
-                items.append((key, {'label': label, 'img': image_link, 'img_alt': image_alt, 'group_select': group_select}))
+                items.append(
+                    (key, {'label': label, 'img': image_link, 'img_alt': image_alt, 'group_select': group_select}))
             else:
                 items.append([key, label])
 
@@ -652,6 +653,7 @@ class PollBlock(PollBase, CSVExportMixin):
             'items': [
                 {
                     'key': key, 'text': value['label'], 'img': value['img'], 'img_alt': value.get('img_alt'),
+                    'group_select': value.get('group_select'),
                     'noun': 'answer', 'image': True,
                 }
                 for key, value in self.answers
@@ -795,10 +797,10 @@ class PollBlock(PollBase, CSVExportMixin):
              """
              <poll tally="{'long': 20, 'short': 29, 'not_saying': 15, 'longer' : 35}"
                  question="## How long have you been studying with us?"
-                 answers='[["longt", {"label": "A very long time", "img": null, "img_alt": null}],
-                           ["short", {"label": "Not very long", "img": null, "img_alt": null}],
-                           ["not_saying", {"label": "I shall not say", "img": null, "img_alt": null}],
-                           ["longer", {"label": "Longer than you", "img": null, "img_alt": null}]]'
+                 answers='[["longt", {"label": "A very long time", "img": null, "img_alt": null, "group_select": null}],
+                           ["short", {"label": "Not very long", "img": null, "img_alt": null, "group_select": null}],
+                           ["not_saying", {"label": "I shall not say", "img": null, "img_alt": null, "group_select": null}],
+                           ["longer", {"label": "Longer than you", "img": null, "img_alt": null, "group_select": null}]]'
                  feedback="### Thank you&#10;&#10;for being a valued student."/>
              """),
         ]
@@ -1205,6 +1207,7 @@ class SurveyBlock(PollBase, CSVExportMixin):
             'items': [
                 {
                     'key': key, 'text': value['label'], 'img': value['img'], 'img_alt': value.get('img_alt'),
+                    'group_select': value.get('group_select'),
                     'noun': 'question', 'image': True,
                 }
                 for key, value in self.questions
@@ -1322,11 +1325,11 @@ class SurveyBlock(PollBase, CSVExportMixin):
                              "q2": {"sa": 3, "a": 2, "n": 3, "d": 10, "sd": 2},
                              "q3": {"sa": 2, "a": 7, "n": 1, "d": 4, "sd": 6},
                              "q4": {"sa": 1, "a": 2, "n": 8, "d": 4, "sd": 5}}'
-                 questions='[["q1", {"label": "I feel like this test will pass.", "img": null, "img_alt": null}],
-                             ["q2", {"label": "I like testing software", "img": null, "img_alt": null}],
-                             ["q3", {"label": "Testing is not necessary", "img": null, "img_alt": null}],
+                 questions='[["q1", {"label": "I feel like this test will pass.", "img": null, "img_alt": null, "group_select" :null}],
+                             ["q2", {"label": "I like testing software", "img": null, "img_alt": null, "group_select" :null}],
+                             ["q3", {"label": "Testing is not necessary", "img": null, "img_alt": null, "group_select" :null}],
                              ["q4", {"label": "I would fake a test result to get software deployed.", "img": null,
-                                     "img_alt": null}]]'
+                                     "img_alt": null, "group_select" :null}]]'
                  answers='[["sa", "Strongly Agree"], ["a", "Agree"], ["n", "Neutral"],
                            ["d", "Disagree"], ["sd", "Strongly Disagree"]]'
                  feedback="### Thank you&#10;&#10;for running the tests."/>
@@ -1335,12 +1338,12 @@ class SurveyBlock(PollBase, CSVExportMixin):
              """
              <vertical_demo>
                  <survey tally='{"q1": {"sa": 5, "a": 5, "n": 3, "d": 2, "sd": 5}}'
-                     questions='[["q1", {"label": "I feel like this test will pass.", "img": null, "img_alt": null}]]'
+                     questions='[["q1", {"label": "I feel like this test will pass.", "img": null, "img_alt": null, "group_select" :null}]]'
                      answers='[["sa", "Strongly Agree"], ["a", "Agree"], ["n", "Neutral"],
                                ["d", "Disagree"], ["sd", "Strongly Disagree"]]'
                      feedback="### Thank you&#10;&#10;for running the tests."/>
                  <survey tally='{"q1": {"sa": 5, "a": 5, "n": 3, "d": 2, "sd": 5}}'
-                     questions='[["q1", {"label": "Most likely to win the World Cup.", "img": null, "img_alt": null}]]'
+                     questions='[["q1", {"label": "Most likely to win the World Cup.", "img": null, "img_alt": null, "group_select" :null}]]'
                      answers='[["sa", "South Africa"], ["a", "Angola"], ["n", "Netherlands"],
                                ["d", "Deutschland"], ["sd", "Someone different"]]'
                      feedback="### Thank you&#10;&#10;for running the tests."/>
