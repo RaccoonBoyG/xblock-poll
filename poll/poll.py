@@ -40,6 +40,7 @@ from web_fragments.fragment import Fragment
 from xblockutils.publish_event import PublishEventMixin
 from xblockutils.resources import ResourceLoader
 from xblockutils.settings import ThemableXBlockMixin, XBlockWithSettingsMixin
+from openedx.core.djangoapps.course_groups.cohorts import get_course_cohorts, get_cohort_by_name
 
 from .utils import DummyTranslationService, _, remove_markdown_and_html_tags
 
@@ -47,6 +48,7 @@ try:
     # pylint: disable=import-error, bad-option-value, ungrouped-imports
     from django.conf import settings
     from api_manager.models import GroupProfile
+
     HAS_GROUP_PROFILE = True
 except ImportError:
     HAS_GROUP_PROFILE = False
@@ -54,6 +56,7 @@ except ImportError:
 try:
     # pylint: disable=import-error
     from common.djangoapps.static_replace import replace_static_urls
+
     HAS_STATIC_REPLACE = True
 except ImportError:
     HAS_STATIC_REPLACE = False
@@ -259,7 +262,8 @@ class PollBase(XBlock, ResourceMixin, PublishEventMixin):
         """
         Convert all items' labels into markdown.
         """
-        return [(key, {'label': markdown(value['label']), 'img': value['img'], 'img_alt': value.get('img_alt')})
+        return [(key, {'label': markdown(value['label']), 'img': value['img'], 'img_alt': value.get('img_alt'),
+                       'group_select': value['group_select']})
                 for key, value in items]
 
     def _get_block_id(self):
@@ -322,6 +326,7 @@ class PollBase(XBlock, ResourceMixin, PublishEventMixin):
             image_link = item.get('img', '').strip()
             image_alt = item.get('img_alt', '').strip()
             label = item.get('label', '').strip()
+            group_select = item.get('group_select', '').strip()
             if not label:
                 if image and not image_link:
                     result['success'] = False
@@ -352,7 +357,7 @@ class PollBase(XBlock, ResourceMixin, PublishEventMixin):
                     )
                 )
             if image:
-                items.append((key, {'label': label, 'img': image_link, 'img_alt': image_alt}))
+                items.append((key, {'label': label, 'img': image_link, 'img_alt': image_alt, 'group_select': group_select}))
             else:
                 items.append([key, label])
 
@@ -705,6 +710,14 @@ class PollBlock(PollBase, CSVExportMixin):
         if not self.can_vote():
             result['errors'].append(self.ugettext('You have already voted as many times as you are allowed.'))
             return result
+        group_select = data['group_select'].strip()
+        if group_select:
+            course_key = getattr(self.scope_ids.usage_id, 'course_key', None)
+            cohort = get_cohort_by_name(course_key=course_key, name=group_select)
+            add_user_to_cohort(cohort, self.request.user)
+            if not cohort:
+                result['errors'].append(self.ugettext("There is no such cohort."))
+                result['success'] = False
 
         self.clean_tally()
         if old_choice is not None:
@@ -728,6 +741,7 @@ class PollBlock(PollBase, CSVExportMixin):
         question = data.get('question', '').strip()
         feedback = data.get('feedback', '').strip()
         private_results = bool(data.get('private_results', False))
+        group_select = data.get('group_select', '').strip()
 
         max_submissions = self.get_max_submissions(self.ugettext, data, result, private_results)
 
@@ -735,6 +749,13 @@ class PollBlock(PollBase, CSVExportMixin):
         if not question:
             result['errors'].append(self.ugettext("You must specify a question."))
             result['success'] = False
+
+        if group_select:
+            course_key = getattr(self.scope_ids.usage_id, 'course_key', None)
+            cohort = get_cohort_by_name(course_key=course_key, name=group_select)
+            if not cohort:
+                result['errors'].append(self.ugettext("There is no such cohort."))
+                result['success'] = False
 
         answers = self.gather_items(data, result, self.ugettext('Answer'), 'answers')
 
@@ -1051,6 +1072,7 @@ class SurveyBlock(PollBase, CSVExportMixin):
                 'label': value['label'],
                 'img': value['img'],
                 'img_alt': value.get('img_alt'),
+                'group_select': value.get('group_select'),
                 'answers': [
                     {
                         'count': count, 'choice': False,
