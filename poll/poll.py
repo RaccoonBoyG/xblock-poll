@@ -509,6 +509,7 @@ class PollBlock(PollBase, CSVExportMixin):
             tally.append({
                 'count': count,
                 'answer': value['label'],
+                'group_select': value['group_select'],
                 'img': value['img'],
                 'img_alt': value.get('img_alt'),
                 'key': key,
