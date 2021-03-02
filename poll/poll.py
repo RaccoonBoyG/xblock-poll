@@ -461,10 +461,10 @@ class PollBlock(PollBase, CSVExportMixin):
     # Key, (Label, Image path)
     answers = List(
         default=[
-            ('R', {'label': _('Red'), 'img': None, 'img_alt': None}),
-            ('B', {'label': _('Blue'), 'img': None, 'img_alt': None}),
-            ('G', {'label': _('Green'), 'img': None, 'img_alt': None}),
-            ('O', {'label': _('Other'), 'img': None, 'img_alt': None}),
+            ('R', {'label': _('Red'), 'img': None, 'img_alt': None, 'group_select': None}),
+            ('B', {'label': _('Blue'), 'img': None, 'img_alt': None, 'group_select': None}),
+            ('G', {'label': _('Green'), 'img': None, 'img_alt': None, 'group_select': None}),
+            ('O', {'label': _('Other'), 'img': None, 'img_alt': None, 'group_select': None}),
         ],
         scope=Scope.settings, help=_("The answer options on this poll.")
     )
