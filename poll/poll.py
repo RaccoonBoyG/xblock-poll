@@ -262,8 +262,7 @@ class PollBase(XBlock, ResourceMixin, PublishEventMixin):
         """
         Convert all items' labels into markdown.
         """
-        return [(key, {'label': markdown(value['label']), 'img': value['img'], 'img_alt': value.get('img_alt'),
-                       'group_select': value['group_select']})
+        return [(key, {'label': markdown(value['label']), 'img': value['img'], 'img_alt': value.get('img_alt')})
                 for key, value in items]
 
     def _get_block_id(self):
